@@ -6,6 +6,11 @@ package auth
 import (
 	fmt "fmt"
 	proto "github.com/golang/protobuf/proto"
+	empty "github.com/golang/protobuf/ptypes/empty"
+	_ "github.com/infobloxopen/atlas-app-toolkit/query"
+	_ "github.com/infobloxopen/atlas-app-toolkit/rpc/resource"
+	_ "github.com/infobloxopen/protoc-gen-gorm/options"
+	_ "google.golang.org/genproto/protobuf/field_mask"
 	math "math"
 )
 
@@ -34,10 +39,13 @@ var _ server.Option
 // Client API for AuthService service
 
 type AuthService interface {
-	Create(ctx context.Context, in *User, opts ...client.CallOption) (*Response, error)
-	Delete(ctx context.Context, in *User, opts ...client.CallOption) (*Response, error)
-	Get(ctx context.Context, in *User, opts ...client.CallOption) (*Response, error)
-	GetAll(ctx context.Context, in *Request, opts ...client.CallOption) (*Response, error)
+	Create(ctx context.Context, in *CreateUserRequest, opts ...client.CallOption) (*CreateUserResponse, error)
+	Read(ctx context.Context, in *ReadUserRequest, opts ...client.CallOption) (*ReadUserResponse, error)
+	Update(ctx context.Context, in *UpdateUserRequest, opts ...client.CallOption) (*UpdateUserResponse, error)
+	UpdateSet(ctx context.Context, in *UpdateSetUserRequest, opts ...client.CallOption) (*UpdateSetUserResponse, error)
+	List(ctx context.Context, in *ListUserRequest, opts ...client.CallOption) (*ListUserResponse, error)
+	Delete(ctx context.Context, in *DeleteUserRequest, opts ...client.CallOption) (*DeleteUserResponse, error)
+	CustomMethod(ctx context.Context, in *empty.Empty, opts ...client.CallOption) (*empty.Empty, error)
 	Auth(ctx context.Context, in *User, opts ...client.CallOption) (*Token, error)
 	ValidateToken(ctx context.Context, in *Token, opts ...client.CallOption) (*Token, error)
 }
@@ -60,9 +68,9 @@ func NewAuthService(name string, c client.Client) AuthService {
 	}
 }
 
-func (c *authService) Create(ctx context.Context, in *User, opts ...client.CallOption) (*Response, error) {
+func (c *authService) Create(ctx context.Context, in *CreateUserRequest, opts ...client.CallOption) (*CreateUserResponse, error) {
 	req := c.c.NewRequest(c.name, "AuthService.Create", in)
-	out := new(Response)
+	out := new(CreateUserResponse)
 	err := c.c.Call(ctx, req, out, opts...)
 	if err != nil {
 		return nil, err
@@ -70,9 +78,49 @@ func (c *authService) Create(ctx context.Context, in *User, opts ...client.CallO
 	return out, nil
 }
 
-func (c *authService) Delete(ctx context.Context, in *User, opts ...client.CallOption) (*Response, error) {
+func (c *authService) Read(ctx context.Context, in *ReadUserRequest, opts ...client.CallOption) (*ReadUserResponse, error) {
+	req := c.c.NewRequest(c.name, "AuthService.Read", in)
+	out := new(ReadUserResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *authService) Update(ctx context.Context, in *UpdateUserRequest, opts ...client.CallOption) (*UpdateUserResponse, error) {
+	req := c.c.NewRequest(c.name, "AuthService.Update", in)
+	out := new(UpdateUserResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *authService) UpdateSet(ctx context.Context, in *UpdateSetUserRequest, opts ...client.CallOption) (*UpdateSetUserResponse, error) {
+	req := c.c.NewRequest(c.name, "AuthService.UpdateSet", in)
+	out := new(UpdateSetUserResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *authService) List(ctx context.Context, in *ListUserRequest, opts ...client.CallOption) (*ListUserResponse, error) {
+	req := c.c.NewRequest(c.name, "AuthService.List", in)
+	out := new(ListUserResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *authService) Delete(ctx context.Context, in *DeleteUserRequest, opts ...client.CallOption) (*DeleteUserResponse, error) {
 	req := c.c.NewRequest(c.name, "AuthService.Delete", in)
-	out := new(Response)
+	out := new(DeleteUserResponse)
 	err := c.c.Call(ctx, req, out, opts...)
 	if err != nil {
 		return nil, err
@@ -80,19 +128,9 @@ func (c *authService) Delete(ctx context.Context, in *User, opts ...client.CallO
 	return out, nil
 }
 
-func (c *authService) Get(ctx context.Context, in *User, opts ...client.CallOption) (*Response, error) {
-	req := c.c.NewRequest(c.name, "AuthService.Get", in)
-	out := new(Response)
-	err := c.c.Call(ctx, req, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *authService) GetAll(ctx context.Context, in *Request, opts ...client.CallOption) (*Response, error) {
-	req := c.c.NewRequest(c.name, "AuthService.GetAll", in)
-	out := new(Response)
+func (c *authService) CustomMethod(ctx context.Context, in *empty.Empty, opts ...client.CallOption) (*empty.Empty, error) {
+	req := c.c.NewRequest(c.name, "AuthService.CustomMethod", in)
+	out := new(empty.Empty)
 	err := c.c.Call(ctx, req, out, opts...)
 	if err != nil {
 		return nil, err
@@ -123,20 +161,26 @@ func (c *authService) ValidateToken(ctx context.Context, in *Token, opts ...clie
 // Server API for AuthService service
 
 type AuthServiceHandler interface {
-	Create(context.Context, *User, *Response) error
-	Delete(context.Context, *User, *Response) error
-	Get(context.Context, *User, *Response) error
-	GetAll(context.Context, *Request, *Response) error
+	Create(context.Context, *CreateUserRequest, *CreateUserResponse) error
+	Read(context.Context, *ReadUserRequest, *ReadUserResponse) error
+	Update(context.Context, *UpdateUserRequest, *UpdateUserResponse) error
+	UpdateSet(context.Context, *UpdateSetUserRequest, *UpdateSetUserResponse) error
+	List(context.Context, *ListUserRequest, *ListUserResponse) error
+	Delete(context.Context, *DeleteUserRequest, *DeleteUserResponse) error
+	CustomMethod(context.Context, *empty.Empty, *empty.Empty) error
 	Auth(context.Context, *User, *Token) error
 	ValidateToken(context.Context, *Token, *Token) error
 }
 
 func RegisterAuthServiceHandler(s server.Server, hdlr AuthServiceHandler, opts ...server.HandlerOption) error {
 	type authService interface {
-		Create(ctx context.Context, in *User, out *Response) error
-		Delete(ctx context.Context, in *User, out *Response) error
-		Get(ctx context.Context, in *User, out *Response) error
-		GetAll(ctx context.Context, in *Request, out *Response) error
+		Create(ctx context.Context, in *CreateUserRequest, out *CreateUserResponse) error
+		Read(ctx context.Context, in *ReadUserRequest, out *ReadUserResponse) error
+		Update(ctx context.Context, in *UpdateUserRequest, out *UpdateUserResponse) error
+		UpdateSet(ctx context.Context, in *UpdateSetUserRequest, out *UpdateSetUserResponse) error
+		List(ctx context.Context, in *ListUserRequest, out *ListUserResponse) error
+		Delete(ctx context.Context, in *DeleteUserRequest, out *DeleteUserResponse) error
+		CustomMethod(ctx context.Context, in *empty.Empty, out *empty.Empty) error
 		Auth(ctx context.Context, in *User, out *Token) error
 		ValidateToken(ctx context.Context, in *Token, out *Token) error
 	}
@@ -151,20 +195,32 @@ type authServiceHandler struct {
 	AuthServiceHandler
 }
 
-func (h *authServiceHandler) Create(ctx context.Context, in *User, out *Response) error {
+func (h *authServiceHandler) Create(ctx context.Context, in *CreateUserRequest, out *CreateUserResponse) error {
 	return h.AuthServiceHandler.Create(ctx, in, out)
 }
 
-func (h *authServiceHandler) Delete(ctx context.Context, in *User, out *Response) error {
+func (h *authServiceHandler) Read(ctx context.Context, in *ReadUserRequest, out *ReadUserResponse) error {
+	return h.AuthServiceHandler.Read(ctx, in, out)
+}
+
+func (h *authServiceHandler) Update(ctx context.Context, in *UpdateUserRequest, out *UpdateUserResponse) error {
+	return h.AuthServiceHandler.Update(ctx, in, out)
+}
+
+func (h *authServiceHandler) UpdateSet(ctx context.Context, in *UpdateSetUserRequest, out *UpdateSetUserResponse) error {
+	return h.AuthServiceHandler.UpdateSet(ctx, in, out)
+}
+
+func (h *authServiceHandler) List(ctx context.Context, in *ListUserRequest, out *ListUserResponse) error {
+	return h.AuthServiceHandler.List(ctx, in, out)
+}
+
+func (h *authServiceHandler) Delete(ctx context.Context, in *DeleteUserRequest, out *DeleteUserResponse) error {
 	return h.AuthServiceHandler.Delete(ctx, in, out)
 }
 
-func (h *authServiceHandler) Get(ctx context.Context, in *User, out *Response) error {
-	return h.AuthServiceHandler.Get(ctx, in, out)
-}
-
-func (h *authServiceHandler) GetAll(ctx context.Context, in *Request, out *Response) error {
-	return h.AuthServiceHandler.GetAll(ctx, in, out)
+func (h *authServiceHandler) CustomMethod(ctx context.Context, in *empty.Empty, out *empty.Empty) error {
+	return h.AuthServiceHandler.CustomMethod(ctx, in, out)
 }
 
 func (h *authServiceHandler) Auth(ctx context.Context, in *User, out *Token) error {

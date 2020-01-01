@@ -2,11 +2,26 @@ syntax = "proto3";
 
 package auth;
 
+import "google/protobuf/empty.proto";
+import "google/protobuf/field_mask.proto";
+
+import "github.com/infobloxopen/protoc-gen-gorm/options/gorm.proto";
+import "github.com/infobloxopen/atlas-app-toolkit/rpc/resource/resource.proto";
+import "github.com/infobloxopen/atlas-app-toolkit/query/collection_operators.proto";
+
 service AuthService {
-    rpc Create(User) returns (Response) {}
-    rpc Delete(User) returns (Response) {}
-    rpc Get(User) returns (Response) {}
-    rpc GetAll(Request) returns (Response) {}
+    rpc Create ( CreateUserRequest ) returns ( CreateUserResponse ) {}
+    rpc Read ( ReadUserRequest ) returns ( ReadUserResponse ) {}
+    rpc Update ( UpdateUserRequest ) returns ( UpdateUserResponse ) {}
+    rpc UpdateSet (UpdateSetUserRequest) returns ( UpdateSetUserResponse) {}
+    rpc List ( ListUserRequest ) returns ( ListUserResponse ) {}
+    rpc Delete ( DeleteUserRequest ) returns  ( DeleteUserResponse ) {
+       // This option is required because the type/table can't be inferred
+       // by the return type
+       option (gorm.method).object_type = "User";
+    }
+
+    rpc CustomMethod ( google.protobuf.Empty ) returns  ( google.protobuf.Empty ) {}
     rpc Auth(User) returns (Token) {}
     rpc ValidateToken(Token) returns (Token) {}
 }
@@ -19,22 +34,86 @@ enum UserRole {
 }
 
 message User {
-    string id = 1;
+    option (gorm.opts) = {
+        ormable: true,
+        table: "users"
+    };
+    atlas.rpc.Identifier id = 1 [(gorm.field).tag = {type: "uuid" primary_key: true}];
     string name = 2;
     string sekolah_id = 3;
     string email = 4;
     string password = 5;
-    string token = 6;
     UserRole user_role = 7;
+    string token = 8;
 }
 
-message Request {}
+message CreateUserRequest {
+    // Convention dictates that this field be of the given type, and be
+    // named 'payload' in order to autogenerate the handler
+    User payload = 1;
+}
 
-message Response {
-    User user = 1;
-    repeated User users = 2;
-    repeated Error errors = 3;
-    Token token = 4;
+message CreateUserResponse {
+    // Convention also requires that the return type be the same and named 'result'
+    User result = 1;
+    Token token = 2;
+}
+
+message ReadUserRequest {
+    // For a read request, the id field is the only to be specified
+    atlas.rpc.Identifier id = 1;
+    infoblox.api.FieldSelection fields = 2;
+}
+
+message ReadUserResponse {
+    // Again the type with 'result' name
+    User result = 1;
+}
+
+message UpdateUserRequest {
+    User payload = 1;
+    google.protobuf.FieldMask gerogeri_gegege = 2;
+}
+
+message UpdateUserResponse {
+    User result = 1;
+}
+
+message UpdateSetUserRequest {
+    repeated User objects = 1;
+    repeated google.protobuf.FieldMask masks = 2;
+}
+
+message UpdateSetUserResponse {
+    repeated User results = 1;
+}
+
+message DeleteUserRequest {
+    // Only the id is needed for a delete request
+    atlas.rpc.Identifier id = 1;
+}
+
+message DeleteUsersRequest {
+    // Only the id is needed for a delete request
+    repeated atlas.rpc.Identifier ids = 1;
+}
+
+// By convention, on DELETE no response data is given, so either a
+// google.protobuf.empty, or an empty struct is sufficient
+message DeleteUserResponse {
+}
+
+message ListUserRequest {
+    infoblox.api.Filtering filter = 1;
+    infoblox.api.Sorting order_by = 2;
+    infoblox.api.FieldSelection fields = 3;
+    infoblox.api.Pagination paging = 4;
+}
+
+message ListUserResponse {
+    // Note repeated field and plural name 'results'
+    repeated User results = 1;
+    infoblox.api.PageInfo page_info = 2;
 }
 
 message Token {

@@ -11,4 +11,4 @@
 # See also
 #  https://github.com/grpc/grpc-go/tree/master/examples
 
-protoc *.proto --micro_out=. --go_out=. *.proto
+protoc *.proto --micro_out=. --gorm_out=. --go_out=. *.proto
