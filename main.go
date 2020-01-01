@@ -26,4 +26,9 @@ func main() {
 	service.Init()
 	auth.RegisterAuthServiceHandler(service.Server(), new(services.AuthService))
 
+	// Run server
+	if err := service.Run(); err != nil {
+		log.Fatal(err)
+	}
+
 }

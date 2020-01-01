@@ -5,6 +5,10 @@ import (
 
 	auth "github.com/cipta-ageung/simas-user/proto/auth"
 	empty "github.com/golang/protobuf/ptypes/empty"
+
+	"github.com/jinzhu/gorm"
+
+	query1 "github.com/infobloxopen/atlas-app-toolkit/query"
 )
 
 // AuthService : struct interface
@@ -26,7 +30,19 @@ func (g *AuthService) Delete(ctx context.Context, req *auth.DeleteUserRequest, r
 }
 
 // Read : method get user
-func (g *AuthService) Read(context.Context, *auth.ReadUserRequest, *auth.ReadUserResponse) error {
+func (g *AuthService) Read(ctx context.Context, req *auth.ReadUserRequest, rsp *auth.ReadUserResponse) error {
+
+	flds := &query1.FieldSelection{}
+	flds.Add("Id")
+
+	user, error := auth.DefaultReadUser(ctx, &auth.User{Id: req.Id}, &gorm.DB{}, flds)
+
+	if error != nil {
+		return error
+	}
+
+	rsp.Result = user
+
 	return nil
 }
 
