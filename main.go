@@ -11,13 +11,14 @@ import (
 	// driver postgres
 	_ "github.com/jinzhu/gorm/dialects/postgres"
 
-	cfg "github.com/cipta-ageung/simas-db/config"
 	pgdb "github.com/cipta-ageung/simas-db/proto"
 	auth "github.com/cipta-ageung/simas-user/proto/auth"
 	services "github.com/cipta-ageung/simas-user/services"
 	"github.com/micro/go-micro"
 
 	microclient "github.com/micro/go-micro/client"
+
+	query1 "github.com/infobloxopen/atlas-app-toolkit/query"
 )
 
 var (
@@ -25,6 +26,7 @@ var (
 )
 
 func main() {
+	//db.DB().Ping()
 
 	log.Println("starting services user . . .")
 
@@ -57,10 +59,18 @@ func init() {
 		log.Fatalf("cannot setup database")
 	}
 
-	db, err := cfg.Connect(svcDb.ConnectionDb)
+	db, err := gorm.Open("postgres", svcDb.ConnectionDb)
 	if err != nil {
-		log.Fatal("cannot connect database")
+		log.Printf("error")
 	}
 
+	//	auth.DefaultCreateUser(context.Background(), &auth.User{Name: "cipta", SekolahId: "1", Email: "ci@gma.com", Password: "agi12345",
+	//		UserRole: auth.UserRole_ROLE_ADMIN, Token: "asd"}, db)
+
+	flds := &query1.FieldSelection{Fields: query1.FieldSelectionMap{"Name": &query1.Field{Name: "Name"}}}
+
+	user := &auth.User{}
+	user, err = auth.DefaultReadUser(context.Background(), &auth.User{Name: "cipta"}, db, flds)
+	log.Println(user.GetName())
 	defer db.Close()
 }
