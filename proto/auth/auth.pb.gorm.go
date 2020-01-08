@@ -3,21 +3,32 @@
 
 package auth
 
-import context "context"
+import (
+	context "context"
 
-import errors1 "github.com/infobloxopen/protoc-gen-gorm/errors"
-import field_mask1 "google.golang.org/genproto/protobuf/field_mask"
-import gorm1 "github.com/jinzhu/gorm"
-import gorm2 "github.com/infobloxopen/atlas-app-toolkit/gorm"
-import query1 "github.com/infobloxopen/atlas-app-toolkit/query"
-import resource1 "github.com/infobloxopen/atlas-app-toolkit/gorm/resource"
+	errors1 "github.com/infobloxopen/protoc-gen-gorm/errors"
+	field_mask1 "google.golang.org/genproto/protobuf/field_mask"
 
-import fmt "fmt"
-import math "math"
-import _ "github.com/golang/protobuf/ptypes/empty"
-import _ "google.golang.org/genproto/protobuf/field_mask"
-import _ "github.com/infobloxopen/atlas-app-toolkit/rpc/resource"
-import _ "github.com/infobloxopen/atlas-app-toolkit/query"
+	gorm1 "github.com/jinzhu/gorm"
+
+	gorm2 "github.com/infobloxopen/atlas-app-toolkit/gorm"
+
+	query1 "github.com/infobloxopen/atlas-app-toolkit/query"
+
+	resource1 "github.com/infobloxopen/atlas-app-toolkit/gorm/resource"
+
+	fmt "fmt"
+
+	math "math"
+
+	_ "github.com/golang/protobuf/ptypes/empty"
+
+	_ "google.golang.org/genproto/protobuf/field_mask"
+
+	_ "github.com/infobloxopen/atlas-app-toolkit/rpc/resource"
+
+	_ "github.com/infobloxopen/atlas-app-toolkit/query"
+)
 
 // Reference imports to suppress errors if they are not otherwise used.
 var _ = fmt.Errorf

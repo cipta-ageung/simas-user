@@ -14,11 +14,12 @@ import (
 	pgdb "github.com/cipta-ageung/simas-db/proto"
 	auth "github.com/cipta-ageung/simas-user/proto/auth"
 	services "github.com/cipta-ageung/simas-user/services"
-	"github.com/micro/go-micro"
-
-	microclient "github.com/micro/go-micro/client"
 
 	query1 "github.com/infobloxopen/atlas-app-toolkit/query"
+	"github.com/micro/go-micro"
+	microclient "github.com/micro/go-micro/client"
+
+	resource "github.com/infobloxopen/atlas-app-toolkit/rpc/resource"
 )
 
 var (
@@ -67,10 +68,21 @@ func init() {
 	//	auth.DefaultCreateUser(context.Background(), &auth.User{Name: "cipta", SekolahId: "1", Email: "ci@gma.com", Password: "agi12345",
 	//		UserRole: auth.UserRole_ROLE_ADMIN, Token: "asd"}, db)
 
-	flds := &query1.FieldSelection{Fields: query1.FieldSelectionMap{"Name": &query1.Field{Name: "Name"}}}
+	//flds := &query1.FieldSelection{Fields: query1.FieldSelectionMap{"Name": &query1.Field{Name: "cipta"}}}
+	/* user := &auth.User{}
+	user, err = auth.DefaultReadUser(context.Background(), &auth.User{Name: "cipta"}, db, flds) */
 
-	user := &auth.User{}
-	user, err = auth.DefaultReadUser(context.Background(), &auth.User{Name: "cipta"}, db, flds)
-	log.Println(user.GetName())
+	//flds := &query1.FieldSelection{Fields: query1.FieldSelectionMap{"name": &query1.Field{Name: "ciptaa"}}}
+	expected := query1.FieldSelection{}
+	ids := &resource.Identifier{
+		ResourceId: "8f9b6aed-0b1e-481f-9bee-0eee7bfcce57",
+	}
+	expected.Add("_fields", "id,name")
+	user := &auth.User{Id: ids}
+	user, err = auth.DefaultReadUser(context.TODO(), user, db, &expected)
+	if err != nil {
+		log.Println("error : user not found")
+	}
+	log.Println(user)
 	defer db.Close()
 }
